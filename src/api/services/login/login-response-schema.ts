@@ -1,6 +1,6 @@
 import {z} from "zod";
 
 export const LoginResponseSchema = z.object({
-    token: z.string(),
-    expiresAt: z.string(),
+    accessToken: z.string(),
+    expiresIn: z.number(),
 })

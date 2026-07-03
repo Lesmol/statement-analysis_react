@@ -3,9 +3,11 @@ import type {LoginRequest, LoginResponse} from "@/api/services/login/login-types
 import {LoginRequestSchema} from "@/api/services/login/login-request-schema.ts";
 import {LoginResponseSchema} from "@/api/services/login/login-response-schema.ts";
 import {LOGIN_ENDPOINTS} from "@/api/services/login/login-endpoints.ts";
+import {BASE_PATHS} from "@/api/api-paths.ts";
+import {BASE_URL} from "@/api/environment.ts";
 
 class LoginService extends HttpService {
-    private baseUrl = "https://iritpjoyg7.execute-api.af-south-1.amazonaws.com/api/v1/auth"
+    private baseUrl = `${BASE_URL}${BASE_PATHS.AUTH}`
 
     async login(request: LoginRequest): Promise<ServiceResult<LoginResponse>> {
         const body = LoginRequestSchema.parse(request)

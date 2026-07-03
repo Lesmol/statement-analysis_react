@@ -1,0 +1,1 @@
+export const BASE_URL = "https://iritpjoyg7.execute-api.af-south-1.amazonaws.com"
