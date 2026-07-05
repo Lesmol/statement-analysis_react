@@ -20,7 +20,6 @@ const LoginPage = () => {
     const {register, handleSubmit, reset} = useForm<LoginValues>()
 
     const loginAction = useAsyncAction(async () => {
-        console.log("Credentials: ", credentials)
         const request: LoginRequest = {
             username: credentials.username,
             password: credentials.password
