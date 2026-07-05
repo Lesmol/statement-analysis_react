@@ -5,7 +5,7 @@ import { defineConfig } from "vite"
 
 // https://vite.dev/config/
 export default defineConfig({
-  envDir: "./config",
+  envPrefix: ["VITE_", "REACT_APP_"],
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

@@ -28,7 +28,7 @@ const LoginPage = () => {
         const response = await loginService.login(request);
 
         if (response.status === "ok") {
-            login(response.data.accessToken, response.data.expiresIn.toString())
+            login(response.data.gatewayToken, response.data.expiresIn.toString())
         }
     })
 
