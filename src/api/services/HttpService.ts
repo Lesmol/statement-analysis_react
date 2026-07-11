@@ -1,4 +1,5 @@
 import {ZodType} from "zod"
+import {BASE_URL} from "@/api/environment.ts"
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
 
@@ -18,12 +19,19 @@ export class HttpService {
             url: string,
             body?: TBody
         ): Promise<Response> => {
+            const headers: Record<string, string> = {
+                "Content-Type": "application/json",
+                "Correlation-id": crypto.randomUUID()
+            }
+
+            const token = localStorage.getItem("gatewayToken")
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`
+            }
+
             return fetch(url, {
                 method,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Correlation-id": crypto.randomUUID()
-                },
+                headers,
                 body: body !== undefined ? JSON.stringify(body) : undefined,
             })
         },
@@ -37,6 +45,10 @@ export class HttpService {
         return { status: "error", data: { message, description } }
     }
 
+    private url(endpoint: string): string {
+        return `${BASE_URL}${endpoint}`
+    }
+
     protected async get(endpoint: string): Promise<ServiceResult>
 
     protected async get<TResponse>(
@@ -48,7 +60,7 @@ export class HttpService {
         schema?: ZodType<TResponse>
     ): Promise<ServiceResult<TResponse | void>> {
         try {
-            const response = await this.httpClient.request("GET", endpoint)
+            const response = await this.httpClient.request("GET", this.url(endpoint))
 
             if (!schema) return this.ok(undefined)
 
@@ -75,7 +87,7 @@ export class HttpService {
         schema?: ZodType<TResponse>
     ): Promise<ServiceResult<TResponse | void>> {
         try {
-            const response = await this.httpClient.request("POST", endpoint, body)
+            const response = await this.httpClient.request("POST", this.url(endpoint), body)
 
             if (!schema) return this.ok(undefined)
 
@@ -102,7 +114,7 @@ export class HttpService {
         schema?: ZodType<TResponse>
     ): Promise<ServiceResult<TResponse | void>> {
         try {
-            const response = await this.httpClient.request("PUT", endpoint, body)
+            const response = await this.httpClient.request("PUT", this.url(endpoint), body)
 
             if (!schema) return this.ok(undefined)
 
@@ -129,7 +141,7 @@ export class HttpService {
         schema?: ZodType<TResponse>
     ): Promise<ServiceResult<TResponse | void>> {
         try {
-            const response = await this.httpClient.request("PATCH", endpoint, body)
+            const response = await this.httpClient.request("PATCH", this.url(endpoint), body)
 
             if (!schema) return this.ok(undefined)
 
@@ -154,7 +166,7 @@ export class HttpService {
         schema?: ZodType<TResponse>
     ): Promise<ServiceResult<TResponse | void>> {
         try {
-            const response = await this.httpClient.request("DELETE", endpoint)
+            const response = await this.httpClient.request("DELETE", this.url(endpoint))
 
             if (!schema) return this.ok(undefined)
 
