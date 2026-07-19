@@ -4,6 +4,8 @@ import { useAuth } from "@/hooks/useAuth.ts"
 import { DashboardProvider } from "@/modules/dashboard/context/DashboardContext.tsx"
 import { ROUTES } from "@/routes.ts"
 import LoginPage from "@/modules/login/pages/LoginPage.tsx"
+import SignUpPage from "@/modules/login/pages/SignUpPage.tsx"
+import ForcePasswordChangePage from "@/modules/login/pages/ForcePasswordChangePage.tsx"
 import UploadPage from "@/modules/dashboard/pages/UploadPage.tsx"
 import ProcessingPage from "@/modules/dashboard/pages/ProcessingPage.tsx"
 import ReportPage from "@/modules/dashboard/pages/ReportPage.tsx"
@@ -28,6 +30,11 @@ export function App() {
           <Routes>
             <Route element={<PublicRoute />}>
               <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+              <Route path={ROUTES.SIGNUP} element={<SignUpPage />} />
+              <Route
+                path={ROUTES.SET_PASSWORD}
+                element={<ForcePasswordChangePage />}
+              />
             </Route>
             <Route element={<ProtectedRoute />}>
               <Route path={ROUTES.UPLOAD} element={<UploadPage />} />

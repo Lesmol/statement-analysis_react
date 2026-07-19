@@ -1,9 +1,16 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form"
+import { IconEye, IconEyeOff } from "@tabler/icons-react"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field.tsx"
 import { Input } from "@/components/ui/input.tsx"
 import { Button } from "@/components/ui/button.tsx"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group.tsx"
 import { useAsyncAction } from "@/hooks/useAsyncAction.ts"
 import type { LoginRequest } from "@/api/services/login/login-types.ts"
 import { useServices } from "@/hooks/useServices.ts"
@@ -26,9 +33,10 @@ const LoginPage = () => {
     getFirstReportAccountId,
     setSelectedAccountId,
   } = useDashboard()
-  const { register, handleSubmit, reset } = useForm<LoginValues>()
+  const { register, handleSubmit } = useForm<LoginValues>()
 
   const [errorMessage, setErrorMessage] = useState("")
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   const loginAction = useAsyncAction(async (values: LoginValues) => {
     setErrorMessage("")
@@ -41,7 +49,15 @@ const LoginPage = () => {
     const response = await loginService.login(request)
 
     if (response.status === "ok") {
-      login(response.data.gatewayToken, response.data.expiresIn.toString())
+      if (response.data.requiresPasswordChange) {
+        navigate(ROUTES.SET_PASSWORD, {
+          replace: true,
+          state: { username: values.username, session: response.data.session },
+        })
+        return
+      }
+
+      login(response.data.gatewayToken!, response.data.expiresIn!.toString())
       setUsername(values.username)
 
       if (hasAccountWithReport()) {
@@ -90,13 +106,26 @@ const LoginPage = () => {
               </Field>
               <Field>
                 <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  disabled={loginAction.isPending}
-                  {...register("password")}
-                />
+                <InputGroup>
+                  <InputGroupInput
+                    id="password"
+                    type={isPasswordVisible ? "text" : "password"}
+                    placeholder="Enter your password"
+                    disabled={loginAction.isPending}
+                    {...register("password")}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      type="button"
+                      aria-label={
+                        isPasswordVisible ? "Hide password" : "Show password"
+                      }
+                      onClick={() => setIsPasswordVisible((prev) => !prev)}
+                    >
+                      {isPasswordVisible ? <IconEyeOff /> : <IconEye />}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
               </Field>
 
               {errorMessage && (
@@ -111,12 +140,9 @@ const LoginPage = () => {
                   variant="outline"
                   className="h-[38px] flex-1 rounded-[10px]"
                   disabled={loginAction.isPending}
-                  onClick={() => {
-                    reset()
-                    setErrorMessage("")
-                  }}
+                  onClick={() => navigate(ROUTES.SIGNUP)}
                 >
-                  Reset
+                  Sign up
                 </Button>
                 <Button
                   type="submit"
@@ -132,19 +158,15 @@ const LoginPage = () => {
                           animation: "spin 0.8s linear infinite",
                         }}
                       />
-                      Signing in…
+                      Logging in…
                     </div>
                   ) : (
-                    "Sign in"
+                    "Login"
                   )}
                 </Button>
               </Field>
             </FieldGroup>
           </form>
-        </div>
-
-        <div className="mt-5 text-center text-[12.5px] text-[oklch(0.6_0_0)]">
-          Prototype — any credentials will work
         </div>
       </div>
     </div>
