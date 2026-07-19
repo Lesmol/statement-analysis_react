@@ -25,12 +25,13 @@ interface LoginValues {
 
 interface LoginLocationState {
   temporaryPasswordFlow?: boolean
+  username?: string
 }
 
 const LoginPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { temporaryPasswordFlow } =
+  const { temporaryPasswordFlow, username: defaultUsername } =
     (location.state as LoginLocationState) || {}
   const { loginService } = useServices()
   const { login } = useAuth()
@@ -40,7 +41,9 @@ const LoginPage = () => {
     getFirstReportAccountId,
     setSelectedAccountId,
   } = useDashboard()
-  const { register, handleSubmit } = useForm<LoginValues>()
+  const { register, handleSubmit } = useForm<LoginValues>({
+    defaultValues: { username: defaultUsername },
+  })
 
   const [errorMessage, setErrorMessage] = useState("")
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -109,7 +112,7 @@ const LoginPage = () => {
                 <Input
                   id="username"
                   placeholder="Enter your username"
-                  disabled={loginAction.isPending}
+                  disabled={loginAction.isPending || temporaryPasswordFlow}
                   {...register("username")}
                 />
               </Field>

@@ -47,7 +47,10 @@ const SignUpPage = () => {
       return
     }
 
-    navigate(ROUTES.LOGIN, { replace: true, state: { temporaryPasswordFlow: true } })
+    navigate(ROUTES.LOGIN, {
+      replace: true,
+      state: { temporaryPasswordFlow: true, username: values.email },
+    })
   })
 
   const onSubmit = async (values: SignUpValues) => {
