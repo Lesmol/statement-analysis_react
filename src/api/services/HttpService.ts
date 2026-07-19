@@ -24,7 +24,7 @@ export class HttpService {
                 "Correlation-id": crypto.randomUUID()
             }
 
-            const token = localStorage.getItem("gatewayToken")
+            const token = localStorage.getItem("idToken")
             if (token) {
                 headers["Authorization"] = `Bearer ${token}`
             }

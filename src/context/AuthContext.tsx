@@ -17,8 +17,8 @@ function isTokenValid(): boolean {
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(isTokenValid)
 
-    const login = useCallback((gatewayToken: string, expiresIn: string) => {
-        localStorage.setItem("gatewayToken", gatewayToken)
+    const login = useCallback((idToken: string, expiresIn: string) => {
+        localStorage.setItem("idToken", idToken)
         localStorage.setItem("expiresIn", expiresIn)
         localStorage.setItem("loginTime", Date.now().toString())
         setIsAuthenticated(true)

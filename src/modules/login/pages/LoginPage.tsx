@@ -57,7 +57,7 @@ const LoginPage = () => {
         return
       }
 
-      login(response.data.gatewayToken!, response.data.expiresIn!.toString())
+      login(response.data.idToken!, response.data.expiresIn!.toString())
       setUsername(values.username)
 
       if (hasAccountWithReport()) {
