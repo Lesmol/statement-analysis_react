@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { IconEye, IconEyeOff } from "@tabler/icons-react"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field.tsx"
@@ -23,8 +23,15 @@ interface LoginValues {
   password: string
 }
 
+interface LoginLocationState {
+  temporaryPasswordFlow?: boolean
+}
+
 const LoginPage = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { temporaryPasswordFlow } =
+    (location.state as LoginLocationState) || {}
   const { loginService } = useServices()
   const { login } = useAuth()
   const {
@@ -50,7 +57,7 @@ const LoginPage = () => {
 
     if (response.status === "ok") {
       if (response.data.requiresPasswordChange) {
-        navigate(ROUTES.SET_PASSWORD, {
+        navigate(ROUTES.FORCE_PASSWORD_CHANGE, {
           replace: true,
           state: { username: values.username, session: response.data.session },
         })
@@ -89,7 +96,9 @@ const LoginPage = () => {
         style={{ animation: "fade-up 0.4s ease" }}
       >
         <div className="mb-8 text-center text-[13.5px] text-muted-foreground">
-          Sign in to review your financial reports
+          {temporaryPasswordFlow
+            ? "Enter the temporary password that was sent to your email"
+            : "Sign in to review your financial reports"}
         </div>
 
         <div className="rounded-[14px] border border-border bg-card p-7 shadow-[0_1px_2px_oklch(0_0_0/0.04)]">

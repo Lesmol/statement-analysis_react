@@ -49,7 +49,7 @@ export function AppRouter() {
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
           <Route path={ROUTES.SIGNUP} element={<SignUpPage />} />
           <Route
-            path={ROUTES.SET_PASSWORD}
+            path={ROUTES.FORCE_PASSWORD_CHANGE}
             element={<ForcePasswordChangePage />}
           />
         </Route>

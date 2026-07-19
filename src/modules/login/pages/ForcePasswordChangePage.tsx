@@ -38,6 +38,7 @@ const ForcePasswordChangePage = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
   const { loginService } = useServices()
 
@@ -50,7 +51,7 @@ const ForcePasswordChangePage = () => {
     defaultValues: { username: defaultUsername },
   })
 
-  const setPasswordAction = useAsyncAction(
+  const forcePasswordChangeAction = useAsyncAction(
     async (values: ForcePasswordChangeValues) => {
       const request: ForcePasswordChangeRequest = {
         username: values.username,
@@ -61,7 +62,7 @@ const ForcePasswordChangePage = () => {
       const response = await loginService.forcePasswordChange(request)
 
       if (response.status === "error") {
-        // Do something
+        setErrorMessage(response.data.description || "Password change failed")
         return
       }
 
@@ -80,7 +81,11 @@ const ForcePasswordChangePage = () => {
       return
     }
 
-    await setPasswordAction.execute(values)
+    await forcePasswordChangeAction.execute(values).catch(() => {
+      setErrorMessage(
+        "Unable to connect. Please check your network and try again."
+      )
+    })
   }
 
   return (
@@ -115,7 +120,7 @@ const ForcePasswordChangePage = () => {
                     id="password"
                     type={isPasswordVisible ? "text" : "password"}
                     placeholder="Enter your new password"
-                    disabled={setPasswordAction.isPending}
+                    disabled={forcePasswordChangeAction.isPending}
                     aria-invalid={!!errors.password}
                     {...register("password")}
                   />
@@ -143,7 +148,7 @@ const ForcePasswordChangePage = () => {
                     id="confirm-password"
                     type={isConfirmPasswordVisible ? "text" : "password"}
                     placeholder="Confirm your new password"
-                    disabled={setPasswordAction.isPending}
+                    disabled={forcePasswordChangeAction.isPending}
                     aria-invalid={!!errors.confirmPassword}
                     {...register("confirmPassword")}
                   />
@@ -166,12 +171,18 @@ const ForcePasswordChangePage = () => {
                 <FieldError errors={[errors.confirmPassword]} />
               </Field>
 
+              {errorMessage && (
+                <div className="rounded-lg bg-destructive/10 px-3 py-2.5 text-[13px] text-destructive">
+                  {errorMessage}
+                </div>
+              )}
+
               <Field orientation="horizontal">
                 <Button
                   type="button"
                   variant="outline"
                   className="h-[38px] flex-1 rounded-[10px]"
-                  disabled={setPasswordAction.isPending}
+                  disabled={forcePasswordChangeAction.isPending}
                   onClick={() => navigate(ROUTES.LOGIN)}
                 >
                   Back to sign in
@@ -179,9 +190,9 @@ const ForcePasswordChangePage = () => {
                 <Button
                   type="submit"
                   className="h-[38px] flex-1 rounded-[10px]"
-                  disabled={setPasswordAction.isPending}
+                  disabled={forcePasswordChangeAction.isPending}
                 >
-                  {setPasswordAction.isPending ? (
+                  {forcePasswordChangeAction.isPending ? (
                     <div className="flex items-center gap-2">
                       <div
                         className="h-4 w-4 rounded-full border-2 border-white/30"

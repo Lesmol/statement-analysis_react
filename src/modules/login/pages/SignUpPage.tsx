@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Controller, useForm } from "react-hook-form"
 import {
@@ -23,6 +24,8 @@ const SignUpPage = () => {
 
   const { loginService } = useServices()
 
+  const [errorMessage, setErrorMessage] = useState("")
+
   const {
     register,
     handleSubmit,
@@ -40,11 +43,11 @@ const SignUpPage = () => {
     const response = await loginService.signUp(request)
 
     if (response.status === "error") {
-      // Do something
+      setErrorMessage(response.data.description || "Sign up failed")
       return
     }
 
-    navigate(ROUTES.SET_PASSWORD, { replace: true })
+    navigate(ROUTES.LOGIN, { replace: true, state: { temporaryPasswordFlow: true } })
   })
 
   const onSubmit = async (values: SignUpValues) => {
@@ -58,7 +61,11 @@ const SignUpPage = () => {
       return
     }
 
-    await signUpAction.execute(values)
+    await signUpAction.execute(values).catch(() => {
+      setErrorMessage(
+        "Unable to connect. Please check your network and try again."
+      )
+    })
   }
 
   return (
@@ -107,6 +114,12 @@ const SignUpPage = () => {
                 />
                 <FieldError errors={[errors.phoneNumber]} />
               </Field>
+
+              {errorMessage && (
+                <div className="rounded-lg bg-destructive/10 px-3 py-2.5 text-[13px] text-destructive">
+                  {errorMessage}
+                </div>
+              )}
 
               <Field orientation="horizontal">
                 <Button
